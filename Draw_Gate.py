@@ -97,7 +97,24 @@ canv.create_oval(NO_x + 50, NO_y + 13, NO_x + 60, NO_y + 23, width = 2)
 #==========================================================================================================================
 
 
+#NAND gate ========================================================================================
+NA_x = 1000
+NA_y = 600
+
+canv.create_line(NA_x + 30, NA_y + 36, NA_x, NA_y + 36, NA_x, NA_y, NA_x + 30, NA_y, fill = "black", width = 3)
+canv.create_line(NA_x + 30.3, NA_y, NA_x + 57, NA_y + 18, NA_x + 30.3, NA_y + 36, fill = "black", width = 3, smooth = True)
+
+
+canv.create_oval(NA_x - 4, NA_y + 5, NA_x + 4, NA_y + 13, fill = 'black')
+canv.create_oval(NA_x - 4, NA_y + 23, NA_x + 4, NA_y + 31, fill = 'black')
+canv.create_oval(NA_x + 51, NA_y + 14, NA_x + 61, NA_y + 22, fill = 'black')
+
+canv.create_oval(NA_x + 44, NA_y + 13, NA_x + 54, NA_y + 23, width = 2)
+
+#===================================================================================================
+
+
 
 win.mainloop()
 
-# Start, End, NAND
+# Start, End
