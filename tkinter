@@ -1,0 +1,89 @@
+import tkinter as tk
+from itertools import product
+
+def derive_logic():
+    input1 = input1_entry.get()
+    input2 = input2_entry.get()
+
+    # AND 게이트 논리식 도출
+    and_output = input1 + " AND " + input2
+
+    # OR 게이트 논리식 도출
+    or_output = input1 + " OR " + input2
+
+    # NOT 게이트 논리식 도출
+    not_output = "NOT " + input1
+
+    # 논리식 결과를 레이블에 표시
+    output_label.config(text="AND 논리식: " + and_output +
+                             "\nOR 논리식: " + or_output +
+                             "\nNOT 논리식: " + not_output)
+     # AND 게이트 진리표 도출
+    and_truth_table = generate_truth_table(input1, input2, "AND")
+
+    # OR 게이트 진리표 도출
+    or_truth_table = generate_truth_table(input1, input2, "OR")
+
+    # NOT 게이트 진리표 도출
+    not_truth_table = generate_truth_table(input1, "", "NOT")
+
+    # 진리표 결과를 텍스트 박스에 표시
+    truth_table_text.delete("1.0", tk.END)
+    truth_table_text.insert(tk.END, "AND 게이트 진리표:\n" + and_truth_table +
+                                 "\nOR 게이트 진리표:\n" + or_truth_table +
+                                 "\nNOT 게이트 진리표:\n" + not_truth_table)
+
+def generate_truth_table(input1, input2, gate):
+    inputs = [input1, input2] if gate != "NOT" else [input1]
+    output = gate + " 결과"
+    header = "  |  ".join(inputs + [output])
+    divider = "-" * len(header)
+    truth_table = [header, divider]
+
+    for combination in product("01", repeat=len(inputs)):
+        inputs_values = list(combination)
+        if gate == "AND":
+            output_value = str(int(inputs_values[0]) and int(inputs_values[1]))
+        elif gate == "OR":
+            output_value = str(int(inputs_values[0]) or int(inputs_values[1]))
+        else:  # NOT gate
+            output_value = str(not int(inputs_values[0]))
+        truth_table.append("  |  ".join(inputs_values + [output_value]))
+
+    return "\n".join(truth_table)
+
+# Tkinter 윈도우 생성
+window = tk.Tk()
+window.title("회로도 및 논리식 도출 프로그램")
+window.geometry("500x500")
+window.title("Circuit_Diagram")
+window.option_add("*Font","맑은고딕 25")
+window.configure(bg='black')
+
+# 입력 필드 및 레이블 생성
+input1_label = tk.Label(window, text="입력 1:")
+input1_label.pack()
+
+input1_entry = tk.Entry(window)
+input1_entry.pack()
+
+input2_label = tk.Label(window, text="입력 2:")
+input2_label.pack()
+
+input2_entry = tk.Entry(window)
+input2_entry.pack()
+
+# 논리식 도출 버튼 생성
+derive_button = tk.Button(window, text="논리식 도출", command=derive_logic)
+derive_button.pack()
+
+# 논리식 결과를 표시할 레이블 생성
+output_label = tk.Label(window, text="논리식:")
+output_label.pack()
+
+# 진리표 결과를 표시할 텍스트 박스 생성
+truth_table_text = tk.Text(window, height=10, width=40)
+truth_table_text.pack()
+
+# Tkinter 윈도우 실행
+window.mainloop()
