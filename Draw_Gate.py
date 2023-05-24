@@ -76,4 +76,28 @@ canv.create_oval(N_x + 30, N_y + 12, N_x + 40, N_y + 22, width = 2)
 #======================================================================================================
 
 
+#NOR gate============================================================================================
+
+NO_x = 900
+NO_y = 100
+
+canv.create_line(NO_x, NO_y,       NO_x + 40, NO_y + 2,     NO_x + 50, NO_y + 18, fill = "black", width = 3, smooth = True)
+
+canv.create_line(NO_x, NO_y + 36,  NO_x + 40, NO_y + 34,    NO_x + 50, NO_y + 18, fill = "black", width = 3, smooth = True)
+
+canv.create_line(NO_x, NO_y,       NO_x + 10, NO_y + 20,    NO_x, NO_y + 36, fill = "black", width = 3, smooth = True)
+
+
+canv.create_oval(NO_x, NO_y + 5, NO_x + 8, NO_y + 13, fill = 'black')
+canv.create_oval(NO_x, NO_y + 23, NO_x + 8, NO_y + 31, fill = 'black')
+canv.create_oval(NO_x + 58, NO_y + 14, NO_x + 64, NO_y + 22, fill = 'black')
+
+canv.create_oval(NO_x + 50, NO_y + 13, NO_x + 60, NO_y + 23, width = 2)
+
+#==========================================================================================================================
+
+
+
 win.mainloop()
+
+# Start, End, NAND
