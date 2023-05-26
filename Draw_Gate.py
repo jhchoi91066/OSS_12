@@ -117,4 +117,4 @@ canv.create_oval(NA_x + 44, NA_y + 13, NA_x + 54, NA_y + 23, width = 2)
 
 win.mainloop()
 
-# Start, End
+# Start, End - 폰트 크기, 길이를 얼마로 할지 정해야 하기 때문에 
