@@ -1,0 +1,101 @@
+from asyncio.windows_events import *
+from asyncio.windows_events import NULL
+from re import A
+from tkinter import *
+from functools import partial
+
+
+win = Tk()
+
+win.title("Test")
+win.option_add("*Fonts", "맑은고딕 25")
+win.geometry("1280x800")
+
+canv = Canvas(win, width = 1280, height = 800, background = 'white')
+canv.pack(padx = 0, pady = 0)
+
+a = 0
+
+b = canv.create_line(1070+a, 0, 1070, 800, fill = "black", width = 3)
+
+def mov(event):
+    global a
+    a += 1
+    canv.move(b, a)
+
+
+win.bind("<Up>", mov)
+
+class Point:            #점의 위치
+    px = float()
+    py = float()
+    res = str()
+
+    def __init__(self, x, y):
+        self.px = x
+        self.py = y
+        self.nextP = NULL
+
+    def setPoint(self, x, y):
+        self.px = x
+        self.py = y
+        
+
+class End_P(Point):
+
+    def setres(self, k):
+        self.res = k
+
+
+class Start_P(Point):
+    nextP = End_P(None, None)
+
+    def setnextP(self, k):
+        self.nextP = k
+        self.nextP.setres(self.res)
+     
+
+class gate:
+    loca = Point(None, None)
+    res = str()
+    Inp1 = End_P(None, None)      #가 점의 중간 위치
+    Inp2 = End_P(None, None)
+    Outp = Start_P(None, None)
+
+    def __init__(self, x):      #x는 gate가 처음 왼쪽에 놓일 곳.
+        self.loca = x
+        res = "A 연산자 B or A' "
+
+    def move(self, x):          # 게이트 이동 - 클릭후 이동시켜 main에 놓을때 사용
+        self.loca = x
+
+    #def linked(self, y):        # 
+
+
+
+
+
+class AND_gate(gate):
+
+    def __init__(self):
+        self.loca = Point()
+
+    
+
+
+
+arr = []
+#arr.append(a)
+
+
+
+
+#abc = Point()
+
+#abc.px = 1
+
+#abc.aaa()
+
+
+
+win.mainloop()
