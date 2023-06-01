@@ -1,0 +1,73 @@
+import tkinter as tk
+from tkinter import ttk
+
+class GateDraggable(tk.Label):
+    def __init__(self, parent, gate_type):
+        super().__init__(parent, text=gate_type, relief=tk.RAISED, width=10, height=2)
+        self.gate_type = gate_type
+        self.bind("<Button-1>", self.on_drag_start)
+        self.bind("<B1-Motion>", self.on_drag_motion)
+        self.bind("<ButtonRelease-1>", self.on_drag_release)
+
+    def on_drag_start(self, event):
+        self.start_x = event.x
+        self.start_y = event.y
+
+    def on_drag_motion(self, event):
+        x = self.winfo_x() - self.start_x + event.x
+        y = self.winfo_y() - self.start_y + event.y
+        self.place(x=x, y=y)
+
+    def on_drag_release(self, event):
+        x = self.winfo_x() - self.start_x + event.x
+        y = self.winfo_y() - self.start_y + event.y
+
+        if self.master.winfo_containing(x, y) != self.master.left_frame:
+            # 왼쪽 공간에 놓지 않은 경우에만 게이트를 생성
+            self.master.create_gate_instance(self.gate_type, x, y)
+        else:
+            # 왼쪽 공간에 놓은 경우, 게이트 모양으로 표현
+            self.place_forget()
+            gate_shape = GateDraggable(self.master.left_frame, self.gate_type)
+            gate_shape.place(x=x, y=y)
+
+class CircuitDesigner(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Circuit Designer")
+
+        self.left_frame = ttk.Frame(self, width=300, height=600)
+        self.left_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=10, pady=10)
+
+        self.right_frame = ttk.Frame(self, width=400, height=600, relief=tk.SUNKEN, borderwidth=2)
+        self.right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, padx=10, pady=10)
+
+        self.gate_instances = []
+
+        self.create_gates()
+
+    def create_gates(self):
+        gates = ["AND", "OR", "NOT", "NOR", "NAND"]
+        row, col = 0, 0
+
+        for gate_type in gates:
+            gate = GateDraggable(self.right_frame, gate_type)
+            gate.grid(row=row, column=col, padx=10, pady=10)
+            col += 1
+
+            if col > 1:
+                col = 0
+                row += 1
+
+    def create_gate_instance(self, gate_type, x, y):
+        gate_instance = GateDraggable(self, gate_type)
+        gate_instance.place(x=x, y=y)
+        self.gate_instances.append(gate_instance)
+
+    def create_gate_shape(self, gate_type, x, y):
+        gate_shape = tk.Label(self.left_frame, text=gate_type, relief=tk.RAISED, width=10, height=2)
+        gate_shape.place(x=x, y=y)
+
+if __name__ == "__main__":
+    app = CircuitDesigner()
+    app.mainloop()
