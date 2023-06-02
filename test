@@ -1,27 +1,18 @@
+from ast import Delete
 from asyncio.windows_events import *
 from asyncio.windows_events import NULL
-from re import A
 from tkinter import *
-from functools import partial
 
-
+global win
 win = Tk()
 
 win.title("Test")
 win.option_add("*Fonts", "맑은고딕 25")
 win.geometry("1280x800")
 
+global canv
 canv = Canvas(win, width = 1280, height = 800, background = 'white')
 canv.pack(padx = 0, pady = 0)
-
-a = 0
-
-b = canv.create_line(1070+a, 0, 1070, 800, fill = "black", width = 3)
-
-def mov(event):
-    global a
-    a += 1
-    canv.move(b, a)
 
 
 win.bind("<Up>", mov)
@@ -30,29 +21,85 @@ class Point:            #점의 위치
     px = float()
     py = float()
     res = str()
+    b = canv.create_oval(px - 4, py - 4, px + 4, py + 4, fill="black")
 
     def __init__(self, x, y):
         self.px = x
         self.py = y
-        self.nextP = NULL
+        self.res = None
+        canv.delete(self.b)
+        self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
 
     def setPoint(self, x, y):
         self.px = x
         self.py = y
+        canv.delete(self.b)
+        self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
+
+
+    def setRes(self, c):
+        self.res = c
         
 
-class End_P(Point):
 
-    def setres(self, k):
-        self.res = k
+global End_ps
+End_ps = []         #끝 점들 모음.
 
 
 class Start_P(Point):
-    nextP = End_P(None, None)
+    nextP = []
+    line = []
+
+
+    def __init__(self, x, y):
+        self.px = x
+        self.py = y
+        canv.delete(self.b)
+        self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
+        
+        canv.tag_bind(self.b, '<B1-Motion>', self.line_drawing)
+        canv.tag_bind(self.b, '<ButtonRelease-1>', self.line_end)
+
+
+    def __del__(self):
+        canv.delete(self.b)
+
 
     def setnextP(self, k):
-        self.nextP = k
-        self.nextP.setres(self.res)
+        self.nextP.append(k)
+        self.nextP[len(self.line)-1].setRes(self.res)
+
+
+    def del_all_line(self):
+        while(len(self.line) == 0):
+            if(type(self.nextP[0]) == Start_P):
+                self.nextP.del_all_line()
+                canv.delete(self.nextP[0])
+
+            elif(type(self.nextP) == Point):
+                self.nextP.setRes(None)
+
+            del self.nextP[0]
+
+        for i in range (len(self.line)):
+            canv.delete(self.line[0])
+            del self.line[0]
+
+#=========================================================================================
+
+    def line_drawing(self, event):
+        for i in self.line:
+           canv.delete(self.line)
+        if(self.py <= self.px and self.py >= self.px * (-1)):
+            self.line = canv.create_line(self.px, self.py, event.x, self.py, width=3)
+            self.line
+        elif(self.px <= self.py and self.px >= self.py * (-1)):
+            self.line = canv.create_line(self.px, self.py, event.x, self.py, width=3)
+
+        
+    def line_end:
+
+
      
 
 class gate:
@@ -69,7 +116,7 @@ class gate:
     def move(self, x):          # 게이트 이동 - 클릭후 이동시켜 main에 놓을때 사용
         self.loca = x
 
-    #def linked(self, y):        # 
+    def linked(self, y):
 
 
 
