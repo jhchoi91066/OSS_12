@@ -52,30 +52,52 @@ class Start_P(Point):
     def __init__(self, x, y):
         self.px = x
         self.py = y
+        self.nextP = []
+        self.line = []
+        self.clk = 0
         self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
         
         canv.tag_bind(self.b, '<B1-Motion>', self.line_drawing)
         canv.tag_bind(self.b, '<ButtonRelease-1>', self.line_end)
-        canv.tag_bind(self.b, '<Button-3>', self.del_all_line)
+        canv.tag_bind(self.b, '<Button-3>', self.del_all_line_Ev)
 
-
-    def __del__(self):
+    def del_b(self):
         canv.delete(self.b)
+
 
 
     def setnextP(self, k):
         self.nextP.append(k)
         self.nextP[len(self.line)-1].setRes(self.res)
 
-
-    def del_all_line(self, event):
-        while(len(self.nextP) == 0):
-            if(type(self.nextP[0]) == Start_P):
-                self.nextP.del_all_line()
+    def del_all_line(self):
+        while(len(self.nextP) != 0):
+            print(self.px)
+            if(type(self.nextP[0]) == type(self)):
+                self.nextP[0].del_all_line()
+                self.nextP[0].del_b()
                 c = self.nextP.pop(0)
-                del(c)
+                del c
 
-            elif(type(self.nextP) == int):
+            elif(type(self.nextP[0]) == int):
+                global End_ps
+                End_ps[self.nextP[0]].setRes(None)
+                del(self.nextP[0])
+
+        for i in range (len(self.line)):
+            canv.delete(self.line[0])
+            del self.line[0]
+
+
+    def del_all_line_Ev(self, event):
+        while(len(self.nextP) != 0):
+            if(type(self.nextP[0]) == type(self)):
+                self.nextP[0].del_all_line()
+                self.nextP[0].del_b()
+                c = self.nextP.pop(0)
+                del c
+
+            elif(type(self.nextP[0]) == int):
                 global End_ps
                 End_ps[self.nextP[0]].setRes(None)
                 del(self.nextP[0])
@@ -109,7 +131,7 @@ class Start_P(Point):
             if(event.x <= i.px + 4 and event.x >= i.px -4 and event.y >=i.py - 4 and event.y <= i.py + 4):
                 canv.delete(self.line[-1])
                 del self.line[-1]
-                self.line.append(canv.create_line(self.px, self.py, self.px, event.y, event.x, event.y, width=5))
+                self.line.append(canv.create_line(self.px, self.py, self.px, i.py, i.px - 4, i.py, width=5))
                 self.nextP.append(k)
                 i.setRes(self.res)
                 self.clk = 0
