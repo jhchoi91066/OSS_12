@@ -72,7 +72,6 @@ class Start_P(Point):
 
     def del_all_line(self):
         while(len(self.nextP) != 0):
-            print(self.px)
             if(type(self.nextP[0]) == type(self)):
                 self.nextP[0].del_all_line()
                 self.nextP[0].del_b()
