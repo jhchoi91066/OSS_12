@@ -15,19 +15,16 @@ canv = Canvas(win, width = 1280, height = 800, background = 'white')
 canv.pack(padx = 0, pady = 0)
 
 
-win.bind("<Up>", mov)
-
 class Point:            #점의 위치
     px = float()
     py = float()
     res = str()
-    b = canv.create_oval(px - 4, py - 4, px + 4, py + 4, fill="black")
+    b = int()
 
     def __init__(self, x, y):
         self.px = x
         self.py = y
         self.res = None
-        canv.delete(self.b)
         self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
 
     def setPoint(self, x, y):
@@ -49,16 +46,17 @@ End_ps = []         #끝 점들 모음.
 class Start_P(Point):
     nextP = []
     line = []
+    clk = 0
 
 
     def __init__(self, x, y):
         self.px = x
         self.py = y
-        canv.delete(self.b)
         self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
         
         canv.tag_bind(self.b, '<B1-Motion>', self.line_drawing)
         canv.tag_bind(self.b, '<ButtonRelease-1>', self.line_end)
+        canv.tag_bind(self.b, '<Button-3>', self.del_all_line)
 
 
     def __del__(self):
@@ -70,38 +68,61 @@ class Start_P(Point):
         self.nextP[len(self.line)-1].setRes(self.res)
 
 
-    def del_all_line(self):
-        while(len(self.line) == 0):
+    def del_all_line(self, event):
+        while(len(self.nextP) == 0):
             if(type(self.nextP[0]) == Start_P):
                 self.nextP.del_all_line()
-                canv.delete(self.nextP[0])
+                c = self.nextP.pop(0)
+                del(c)
 
-            elif(type(self.nextP) == Point):
-                self.nextP.setRes(None)
-
-            del self.nextP[0]
+            elif(type(self.nextP) == int):
+                global End_ps
+                End_ps[self.nextP[0]].setRes(None)
+                del(self.nextP[0])
 
         for i in range (len(self.line)):
             canv.delete(self.line[0])
             del self.line[0]
 
-#=========================================================================================
 
     def line_drawing(self, event):
-        for i in self.line:
-           canv.delete(self.line)
-        if(self.py <= self.px and self.py >= self.px * (-1)):
-            self.line = canv.create_line(self.px, self.py, event.x, self.py, width=3)
-            self.line
-        elif(self.px <= self.py and self.px >= self.py * (-1)):
-            self.line = canv.create_line(self.px, self.py, event.x, self.py, width=3)
-
+        if(self.clk == 1):
+            canv.delete(self.line[-1])
+            del self.line[-1]
         
-    def line_end:
+        if(event.y <= self.py + 1 and event.y >= self.py -1):
+            self.line.append(canv.create_line(self.px + 4, self.py, event.x, self.py, width = 5))
+        elif(event.x <= self.px + 1 and event.x >= self.px -1):
+            self.line.append(canv.create_line(self.px, self.py + 4, self.px, event.y, width = 5))
+        elif(abs(event.y) - self.py <= abs(event.x) - self.px):
+            self.line.append(canv.create_line(self.px + 4, self.py, event.x, self.py, event.x, event.y, width=5))
+        elif(abs(event.y) - self.py >= abs(event.x) - self.px):
+            self.line.append(canv.create_line(self.px, self.py + 4, self.px, event.y, event.x, event.y, width=5))
+
+        self.clk = 1
+        
+
+    def line_end(self, event):
+        global End_ps
+        for k in range(len(End_ps)):
+            i = End_ps[k]
+            if(event.x <= i.px + 4 and event.x >= i.px -4 and event.y >=i.py - 4 and event.y <= i.py + 4):
+                canv.delete(self.line[-1])
+                del self.line[-1]
+                self.line.append(canv.create_line(self.px, self.py, self.px, event.y, event.x, event.y, width=5))
+                self.nextP.append(k)
+                i.setRes(self.res)
+                self.clk = 0
+                break
+        if(self.clk == 1):
+            self.nextP.append(Start_P(event.x, event.y))
+            self.nextP[-1].setRes(self.res)
+            self.clk = 0
+
 
 
      
-
+'''
 class gate:
     loca = Point(None, None)
     res = str()
@@ -129,19 +150,14 @@ class AND_gate(gate):
 
     
 
+'''
+a = Start_P(100, 100)
+
+b = Point(500, 500)
+End_ps.append(b)
 
 
-arr = []
-#arr.append(a)
 
-
-
-
-#abc = Point()
-
-#abc.px = 1
-
-#abc.aaa()
 
 
 
