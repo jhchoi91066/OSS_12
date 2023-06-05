@@ -87,7 +87,7 @@ class Start_P(Point):
             del self.line[0]
 
 
-    def del_all_line_Ev(self, event):
+    def del_all_line_Ev(self, event):       #대체
         while(len(self.nextP) != 0):
             if(type(self.nextP[0]) == type(self)):
                 self.nextP[0].del_all_line()
