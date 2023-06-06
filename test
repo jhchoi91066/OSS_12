@@ -13,12 +13,78 @@ global canv
 canv = Canvas(win, width = 1280, height = 800, background = 'white')
 canv.pack(padx = 0, pady = 0)
 
+def Draw_gate(Type, x, y):
+    shapes = []
+    if(Type == 'And'):
+        #AND gate ========================================================================================
+        A_x = x - 15
+        A_y = y - 18
+
+        shapes.append(canv.create_line(A_x + 30, A_y + 36, A_x, A_y + 36, A_x, A_y, A_x + 30, A_y, fill = "black", width = 3))
+        shapes.append(canv.create_line(A_x + 30.3, A_y, A_x + 57, A_y + 18, A_x + 30.3, A_y + 36, fill = "black", width = 3, smooth = True))
+
+    elif(Type == "Or"):
+        #OR gate============================================================================================
+        O_x = x - 25
+        O_y = y - 18
+
+        shapes.append(canv.create_line(O_x, O_y,       O_x + 40, O_y + 2,     O_x + 50, O_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(O_x, O_y + 36,  O_x + 40, O_y + 34,    O_x + 50, O_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(O_x, O_y,       O_x + 10, O_y + 20,    O_x, O_y + 36, fill = "black", width = 3, smooth = True))
+
+    elif(Type == "Ex_or"):
+            #Ex_OR gate============================================================================================
+        EO_x = x - 25
+        EO_y = y - 18
+
+        shapes.append(canv.create_line(EO_x, EO_y,       EO_x + 40, EO_y + 2,     EO_x + 50, EO_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(EO_x, EO_y + 36,  EO_x + 40, EO_y + 34,    EO_x + 50, EO_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(EO_x, EO_y,       EO_x + 10, EO_y + 20,    EO_x, EO_y + 36, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(EO_x - 8, EO_y,       EO_x + 2, EO_y + 20,    EO_x - 8, EO_y + 36, fill = "black", width = 2.5, smooth = True))
+
+    elif(Type == "Not"):
+       #NOT gate============================================================================================
+
+        N_x = x - 10
+        N_y = y - 9
+
+        shapes.append(canv.create_line(N_x, N_y,       N_x, N_y + 34,     N_x + 30, N_y + 18, N_x, N_y, fill = "black", width = 3))
+        shapes.append(canv.create_oval(N_x + 30, N_y + 13, N_x + 40, N_y + 23, width = 2))
+
+
+    elif(Type == "Nor"):
+        #NOR gate============================================================================================
+        
+        NO_x = x - 25
+        NO_y = y - 18
+
+        shapes.append(canv.create_line(NO_x, NO_y,       NO_x + 40, NO_y + 2,     NO_x + 50, NO_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(NO_x, NO_y + 36,  NO_x + 40, NO_y + 34,    NO_x + 50, NO_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(NO_x, NO_y,       NO_x + 10, NO_y + 20,    NO_x, NO_y + 36, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_oval(NO_x + 50, NO_y + 13, NO_x + 60, NO_y + 23, width = 2))
+
+    elif(Type == "Nand"):
+
+        #NAND gate ========================================================================================
+        NA_x = x - 15
+        NA_y = y - 18
+
+        shapes.append(canv.create_line(NA_x + 30, NA_y + 36, NA_x, NA_y + 36, NA_x, NA_y, NA_x + 30, NA_y, fill = "black", width = 3))
+        shapes.append(canv.create_line(NA_x + 30.3, NA_y, NA_x + 57, NA_y + 18, NA_x + 30.3, NA_y + 36, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_oval(NA_x + 44, NA_y + 13, NA_x + 54, NA_y + 23, width = 2))
+
+    # Start End
+
+    return shapes
+#==============================================================================================
+
 
 class Point:            #점의 위치
     px = float()
     py = float()
     res = str()
     b = int()
+    F_S = -1    #input 2개인 gate - 몇번째인지 / 1개인 gate 구분 위함
 
     def __init__(self, x, y):
         self.px = x
@@ -32,9 +98,19 @@ class Point:            #점의 위치
         canv.delete(self.b)
         self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
 
-
-    def setRes(self, c):
-        self.res = c
+    def setRes(self, val):
+        self.res = val
+        if self.gate:
+            if(self.F_S == 0):
+                self.gate.Input0 = val
+            elif(self.F_S == 1):
+                self.gate.Input1 = val
+            elif(self.F_S == 2):
+                self.gate.Input2 = val
+        
+    def set_gate(self, gate, num):
+        self.gate = gate
+        self.F_S = num
         
 
 
@@ -54,6 +130,8 @@ class Start_P(Point):
         self.nextP = []
         self.line = []
         self.clk = 0
+        self.linked_x = []
+        self.linked_y = []
         self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
         
         canv.tag_bind(self.b, '<B1-Motion>', self.line_drawing)
@@ -62,7 +140,18 @@ class Start_P(Point):
 
     def del_b(self):
         canv.delete(self.b)
-
+    
+    def setRes(self, c):
+        global End_ps
+        self.res = c
+        for i in self.nextP:
+            if(type(i) == type(self)):
+                i.setRes(c)
+            elif(type(i) == int()):
+                if(self.check_next_Real(i)):
+                    End_ps[i].setRes(c)
+                else:
+                    self.del_void_link
 
 
     def setnextP(self, k):
@@ -79,7 +168,9 @@ class Start_P(Point):
 
             elif(type(self.nextP[0]) == int):
                 global End_ps
-                End_ps[self.nextP[0]].setRes(None)
+                if(self.check_next_Real(self.nextP[0]) == True):
+                    End_ps[self.nextP[0]].setRes(None)
+                    self.del_void_link
                 del(self.nextP[0])
 
         for i in range (len(self.line)):
@@ -87,22 +178,8 @@ class Start_P(Point):
             del self.line[0]
 
 
-    def del_all_line_Ev(self, event):       #대체
-        while(len(self.nextP) != 0):
-            if(type(self.nextP[0]) == type(self)):
-                self.nextP[0].del_all_line()
-                self.nextP[0].del_b()
-                c = self.nextP.pop(0)
-                del c
-
-            elif(type(self.nextP[0]) == int):
-                global End_ps
-                End_ps[self.nextP[0]].setRes(None)
-                del(self.nextP[0])
-
-        for i in range (len(self.line)):
-            canv.delete(self.line[0])
-            del self.line[0]
+    def del_all_line_Ev(self, event):
+        self.del_all_line()
 
 
     def line_drawing(self, event):
@@ -110,13 +187,13 @@ class Start_P(Point):
             canv.delete(self.line[-1])
             del self.line[-1]
         
-        if(event.y <= self.py + 1 and event.y >= self.py -1):
+        if(event.y <= self.py + 8 and event.y >= self.py - 8):   #가로선
             self.line.append(canv.create_line(self.px + 4, self.py, event.x, self.py, width = 5))
-        elif(event.x <= self.px + 1 and event.x >= self.px -1):
+        elif(event.x <= self.px + 8 and event.x >= self.px - 8): #세로선
             self.line.append(canv.create_line(self.px, self.py + 4, self.px, event.y, width = 5))
-        elif(abs(event.y) - self.py <= abs(event.x) - self.px):
+        elif(abs(event.y) - self.py <= abs(event.x) - self.px): #-|
             self.line.append(canv.create_line(self.px + 4, self.py, event.x, self.py, event.x, event.y, width=5))
-        elif(abs(event.y) - self.py >= abs(event.x) - self.px):
+        elif(abs(event.y) - self.py >= abs(event.x) - self.px): #ㄱ/ㄴ
             self.line.append(canv.create_line(self.px, self.py + 4, self.px, event.y, event.x, event.y, width=5))
 
         self.clk = 1
@@ -133,14 +210,69 @@ class Start_P(Point):
                     self.line.append(canv.create_line(self.px, self.py, self.px, i.py, i.px - 4, i.py, width=5))
                     self.nextP.append(k)
                     i.setRes(self.res)
+                    self.linked_x.append(i.px)
+                    self.linked_y.append(i.py)
                     self.clk = 0
                 break
         if(self.clk == 1):
-            self.nextP.append(Start_P(event.x, event.y))
+            if(event.y <= self.py + 8 and event.y >= self.py -8):
+                self.nextP.append(Start_P(event.x, self.py))
+            elif(event.x <= self.px + 8 and event.x >= self.px - 8): #세로선
+                self.nextP.append(Start_P(self.px, event.y))
+            else:
+                self.nextP.append(Start_P(event.x, event.y))
+
             self.nextP[-1].setRes(self.res)
             self.clk = 0
-     
 
+    def del_void_link(self):
+        global End_ps
+        rec = []
+        for k in range(len(self.linked_x)):
+            clk = 0
+            for i in End_ps:
+                if(i.px == self.linked_x[k] and i.py == self.linked_y[k]):
+                    break
+                clk = 1
+            if(clk == 1):
+                rec.append(k)
+        while(len(rec) != 0):
+            del self.linked_x[rec[-1]]
+            del self.linked_y[rec[-1]]
+            del rec[-1]
+
+
+
+    def check_next_Real(self, i):
+        global End_ps
+        for k in range(len(self.linked_x)):
+            if(End_ps[i].px == self.linked_x[k] and End_ps[i].py == self.linked_y[k]):
+                return True
+        return False
+
+    def del_void_link(self):
+        global End_ps
+        a = []
+        b = []
+        for z in self.nextP:
+            if(type(z) == int()):
+                a.append(z)
+
+        for k in len(self.linked_x):
+            clk = 0
+            for i in a:
+                if(End_ps[a].px == self.linked_x[i] and End_ps[a].py == self.linked_y[i]):
+                    break
+                clk = 1
+            if(clk == 1):
+                b.append(k)
+
+        while(len(b) != 0):
+            del self.linked_x[b[-1]]
+            del self.linked_y[b[-1]]
+            del b[-1]
+
+'''
 class gate:
     #px = float()
     #py = float()
@@ -152,15 +284,62 @@ class gate:
                                     #우클릭 시 아래 or 말풍선으로 식 gate의 res 값 보여줌
 
     def move(self, x):          # 게이트 이동 - 클릭후 이동시켜 main에 놓을때 사용
-        self.loca = x
+        self.loca = x           # 이동시 값 확인 -> 있다면 연결된 곳 가서 선 삭제 -> 본인 값 삭제 -> 
 
     #def linked(self, y):
+    '''
+
+
+class In2_gate:
+    #Type = [And, Nand...]
+    #x, y   위치
+    #shape = 모형
+    #sent   식
+    #res    값
+    #Input1, 2 = Point()
+
+    def __init__(self, Type, x, y):
+        self.Type = Type
+        self.x = x
+        self.y = y
+
+        self.shape = Draw_gate(Type, x, y)
+
+        if (Type == 'And' or 'Nand'):
+            self.Input1 = Point(x - 15, y - 9)
+            self.Input2 = Point(x - 15, y + 9)
+            self.Output = Start_P(x + 28, y)
+            self.Input1.set_gate(self, 1)
+            self.Input2.set_gate(self, 2)
+
+        elif(Type == 'Nor' or 'Ex_or' or 'Nor'):
+            self.Input1 = Point(x - 25, y - 9)
+            self.Input2 = Point(x - 25, y + 9)
+            self.Output = Start_P(x + 23, y)
+            self.Input1.set_gate(self, 1)
+            self.Input2.set_gate(self, 2)
+
+        #canv.tag_bind          
+        
+        '''
+        이동 -> 값 초기화
+                전 / 후 붙은 선 삭제
+        좌클릭 -> 식 출력
+        우클릭 -> 삭제
+        식으로 계산 하는 것 만들기.
+        첫 출발 값은 전역으로 리스트 형식 저장
+        '''
 
 
 
 
 
-class AND_gate(gate):
+
+
+
+
+
+class AND_gate(In2_gate):
 
     def __init__(self, x, y):
         self.px = x
@@ -169,7 +348,7 @@ class AND_gate(gate):
 
 
 class gate_menu:            # 오른쪽에 있을 게이트 생성 위한 모형
-    gate_type = ['Start', 'End', 'And', 'Nand', 'Or', 'Nor', 'Not', 'Ex-Or']
+    listof_gate_type = ['Start', 'End', 'And', 'Nand', 'Or', 'Nor', 'Not', 'Ex-Or']
     px = float()
     py = float()
     #gate_type에 따라 다른 모양의 게이트
