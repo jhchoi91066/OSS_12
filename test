@@ -284,7 +284,7 @@ class gate:
                                     #우클릭 시 아래 or 말풍선으로 식 gate의 res 값 보여줌
 
     def move(self, x):          # 게이트 이동 - 클릭후 이동시켜 main에 놓을때 사용
-        self.loca = x           # 이동시 값 확인 -> 있다면 연결된 곳 가서 선 삭제 -> 본인 값 삭제 -> 
+        self.loca = x           # 이동시 값 확인 -> 있다면 연결된 곳 가서 선 삭제 -> 본인 값 삭제 -> 이동
 
     #def linked(self, y):
     '''
