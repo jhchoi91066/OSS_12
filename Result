@@ -1,6 +1,7 @@
 #reset 버튼 제작중!
 #왼쪽 네모 끌어서 입력창 클릭 후 문자 하나 적고 enter 누르면 값 저장.
 #게이트 클릭 시 아래에 식 나옴. 고정되어있는 오른쪽에 End_gate는 클릭시 창 아래에 나옴.
+#점 좌클릭 -> 드래그 = 선 생성. 점 우클릭 = 선 삭제. *주의* 선 삭제는 클릭이 잘 안 될 수도 있음
 
 from asyncio.windows_events import *
 from asyncio.windows_events import NULL
