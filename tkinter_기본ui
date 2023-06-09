@@ -71,3 +71,40 @@ class CircuitDesigner(tk.Tk):
 if __name__ == "__main__":
     app = CircuitDesigner()
     app.mainloop()
+    
+ 
+#
+def generate_truth_table(gates):
+    inputs = []
+    outputs = []
+    gate_names = []
+
+    # Get input names
+    for gate in gates:
+        if gate.name == "Start":
+            inputs.append(gate.output)
+            gate_names.append(gate.name)
+
+    # Generate truth table
+    for i in range(2 ** len(inputs)):
+        input_values = format(i, '0{}b'.format(len(inputs)))
+        for j, gate in enumerate(gates):
+            if gate.name == "Start":
+                gate.set_output(int(input_values[j]))
+
+        output_values = [gate.calculate_output() for gate in gates if gate.name != "Start"]
+        inputs_str = ', '.join(str(val) for val in input_values)
+        outputs_str = ', '.join(str(val) for val in output_values)
+        print("Inputs: [{}], Outputs: [{}]".format(inputs_str, outputs_str))
+        outputs.append(output_values)
+
+    # Print truth table header
+    inputs_str = ', '.join(gate_names)
+    outputs_str = ', '.join(gate.name for gate in gates if gate.name != "Start")
+    print("\nTruth Table:\nInputs: [{}], Outputs: [{}]".format(inputs_str, outputs_str))
+
+    # Print truth table values
+    for i in range(len(outputs)):
+        inputs_values_str = ', '.join(str(val) for val in inputs[i])
+        outputs_values_str = ', '.join(str(val) for val in outputs[i])
+        print("Inputs: [{}], Outputs: [{}]".format(inputs_values_str, outputs_values_str))
