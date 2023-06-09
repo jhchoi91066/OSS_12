@@ -1,0 +1,674 @@
+#reset 버튼 제작중!
+#왼쪽 네모 끌어서 입력창 클릭 후 문자 하나 적고 enter 누르면 값 저장.
+#게이트 클릭 시 아래에 식 나옴. 고정되어있는 오른쪽에 End_gate는 클릭시 창 아래에 나옴.
+
+from asyncio.windows_events import *
+from asyncio.windows_events import NULL
+from tkinter import *
+
+global win
+win = Tk()
+
+win.title("Test")
+win.option_add("*Fonts", "맑은고딕 25")
+win.geometry("1120x630")
+
+global canv
+canv = Canvas(win, width = 1280, height = 800, background = 'white')
+canv.pack(padx = 0, pady = 0)
+canv.create_line(934, 0, 934, 630, width = 3)
+
+
+'''
+def reset_all():
+    global win, canv, match_N, tag_counts, End_ps
+    match_N = []
+    tag_counts = 0
+    End_ps = []
+    win.destroy()
+    win = Tk()
+    win.title("Test")
+    win.option_add("*Fonts", "맑은고딕 25")
+    win.geometry("1120x630")
+
+    first_setting()
+    
+def first_setting():
+    global win, canv
+
+    
+    canv = Canvas(win, width = 1280, height = 800, background = 'white')
+    canv.pack(padx = 0, pady = 0)
+    canv.create_line(934, 0, 934, 630, width = 3)
+    reset_button = Button(win, text = "Reset!", command = reset_all())
+    reset_button.place(x=0, y=0)
+
+    gate_menu('Start', 1027, 90)
+    gate_menu('And', 1013, 170)
+    gate_menu('Nand', 1013, 250)
+    gate_menu('Not', 1022, 330)
+    gate_menu('Or', 1027, 410)
+    gate_menu('Nor', 1027, 490)
+    gate_menu('Ex_or', 1027, 570)
+    Ed = End_gate()
+
+
+
+reset_button = Button(win, text = "Reset!", command = reset_all)
+reset_button.place(x=0, y=0)
+
+'''
+
+global match_N
+match_N = []        #P, Q등 이름 input 정해지면 (입력한 점, 'P', '1') 형태로 넣기. Start_gate에서 입력 후 enter 시 (점, 이름)은 저장되므로 따로 값 물어보고 입력받아
+                        
+                    #for i in match_N:
+                                #    if(i[1] == '이름'): i.append(str형의 값)        넣으면 아래의 eval_exp 함수 쓸 수 있을 것.
+
+
+
+def eval_exp(expression):
+
+    global match_N
+    for i in match_N:
+        expression = expression.replace(i[1], i[2])
+
+    expression = expression.replace('*', 'and')
+    expression = expression.replace('+', 'or')
+    expression = expression.replace('⊕', '^')
+
+    if(eval(expression) == True): return 1
+    else: return 0
+
+    return result
+
+
+
+def Draw_gate(Type, x, y):
+    shapes = []
+    if(Type == 'And'):
+        #AND gate ========================================================================================
+        A_x = x - 15
+        A_y = y - 18
+
+        shapes.append(canv.create_polygon(A_x + 30, A_y + 36, A_x, A_y + 36, A_x, A_y, A_x + 30, A_y, fill = "white", outline = 'black', width = 3))
+        shapes.append(canv.create_line(A_x + 30, A_y + 36, A_x + 30, A_y, fill = "white", width = 3))
+        shapes.append(canv.create_line(A_x + 30.3, A_y, A_x + 57, A_y + 18, A_x + 30.3, A_y + 36, fill = "black", width = 3, smooth = True))
+
+    elif(Type == "Or"):
+        #OR gate============================================================================================
+        O_x = x - 25
+        O_y = y - 18
+
+        shapes.append(canv.create_polygon(O_x + 5, O_y + 2, O_x + 32, O_y + 2, O_x + 32, O_y + 34, O_x + 5, O_y +34, fill = 'white'))
+        shapes.append(canv.create_line(O_x, O_y,       O_x + 40, O_y + 2,     O_x + 50, O_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(O_x, O_y + 36,  O_x + 40, O_y + 34,    O_x + 50, O_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(O_x, O_y,       O_x + 10, O_y + 20,    O_x, O_y + 36, fill = "black", width = 3, smooth = True))
+
+    elif(Type == "Ex_or"):
+            #Ex_OR gate============================================================================================
+        EO_x = x - 25
+        EO_y = y - 18
+
+        shapes.append(canv.create_polygon(EO_x + 5, EO_y + 2, EO_x + 32, EO_y + 2, EO_x + 32, EO_y + 34, EO_x + 5, EO_y +34, fill = 'white'))
+        shapes.append(canv.create_line(EO_x, EO_y,       EO_x + 40, EO_y + 2,     EO_x + 50, EO_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(EO_x, EO_y + 36,  EO_x + 40, EO_y + 34,    EO_x + 50, EO_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(EO_x, EO_y,       EO_x + 10, EO_y + 20,    EO_x, EO_y + 36, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(EO_x - 8, EO_y,       EO_x + 2, EO_y + 20,    EO_x - 8, EO_y + 36, fill = "black", width = 2.5, smooth = True))
+
+    elif(Type == "Not"):
+       #NOT gate============================================================================================
+
+        N_x = x - 10
+        N_y = y - 17
+
+        shapes.append(canv.create_polygon(N_x, N_y,       N_x, N_y + 34,     N_x + 30, N_y + 17, N_x, N_y, fill = "white", outline = 'black', width = 3))
+        shapes.append(canv.create_oval(N_x + 30, N_y + 12, N_x + 40, N_y + 22, width = 2))
+
+
+    elif(Type == "Nor"):
+        #NOR gate============================================================================================
+        
+        NO_x = x - 25
+        NO_y = y - 18
+
+        shapes.append(canv.create_polygon(NO_x + 5, NO_y + 2, NO_x + 32, NO_y + 2, NO_x + 32, NO_y + 34, NO_x + 5, NO_y +34, fill = 'white'))
+        shapes.append(canv.create_line(NO_x, NO_y,       NO_x + 40, NO_y + 2,     NO_x + 50, NO_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(NO_x, NO_y + 36,  NO_x + 40, NO_y + 34,    NO_x + 50, NO_y + 18, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_line(NO_x, NO_y,       NO_x + 10, NO_y + 20,    NO_x, NO_y + 36, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_oval(NO_x + 50, NO_y + 13, NO_x + 60, NO_y + 23, width = 2))
+
+    elif(Type == "Nand"):
+
+        #NAND gate ========================================================================================
+        NA_x = x - 15
+        NA_y = y - 18
+
+        shapes.append(canv.create_polygon(NA_x + 30, NA_y + 36, NA_x, NA_y + 36, NA_x, NA_y, NA_x + 30, NA_y, fill = "white", outline = 'black', width = 3))
+        shapes.append(canv.create_line(NA_x + 30, NA_y + 36, NA_x + 30, NA_y, fill = "white", width = 3))
+        shapes.append(canv.create_line(NA_x + 30.3, NA_y, NA_x + 57, NA_y + 18, NA_x + 30.3, NA_y + 36, fill = "black", width = 3, smooth = True))
+        shapes.append(canv.create_oval(NA_x + 44, NA_y + 13, NA_x + 54, NA_y + 23, width = 2))
+
+        # Start End
+
+    elif(Type == 'Start'):
+        shapes.append(canv.create_polygon(x + 18, y +18, x - 18, y + 18, x -18, y - 18, x + 18, y - 18, fill = 'white', outline = 'black', width = 3))
+
+
+    return shapes
+#==============================================================================================
+
+def Draw_gate_with_tags(Type, x, y):
+    shapes = []
+    global tag_counts
+    tag_counts = 0
+    tag_count = str(tag_counts)
+    if(Type == 'And'):
+        #AND gate ========================================================================================
+        A_x = x - 15
+        A_y = y - 18
+
+        shapes.append(canv.create_polygon(A_x + 30, A_y + 36, A_x, A_y + 36, A_x, A_y, A_x + 30, A_y, fill = "white", outline = 'black', width = 3, tags='shape'+tag_count))
+        shapes.append(canv.create_line(A_x + 30, A_y + 36, A_x + 30, A_y, fill = "white", width = 3, tags='shape'+tag_count))
+        shapes.append(canv.create_line(A_x + 30.3, A_y, A_x + 57, A_y + 18, A_x + 30.3, A_y + 36, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+     
+    elif(Type == "Or"):
+        #OR gate============================================================================================
+        O_x = x - 25
+        O_y = y - 18
+
+        shapes.append(canv.create_polygon(O_x + 5, O_y + 2, O_x + 32, O_y + 2, O_x + 32, O_y + 34, O_x + 5, O_y +34, fill = 'white', tags='shape'+tag_count))
+        shapes.append(canv.create_line(O_x, O_y,       O_x + 40, O_y + 2,     O_x + 50, O_y + 18, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+        shapes.append(canv.create_line(O_x, O_y + 36,  O_x + 40, O_y + 34,    O_x + 50, O_y + 18, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+        shapes.append(canv.create_line(O_x, O_y,       O_x + 10, O_y + 20,    O_x, O_y + 36, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+
+    elif(Type == "Ex_or"):
+            #Ex_OR gate============================================================================================
+        EO_x = x - 25
+        EO_y = y - 18
+
+        shapes.append(canv.create_polygon(EO_x + 5, EO_y + 2, EO_x + 32, EO_y + 2, EO_x + 32, EO_y + 34, EO_x + 5, EO_y +34, fill = 'white', tags='shape'+tag_count))
+        shapes.append(canv.create_line(EO_x, EO_y,       EO_x + 40, EO_y + 2,     EO_x + 50, EO_y + 18, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+        shapes.append(canv.create_line(EO_x, EO_y + 36,  EO_x + 40, EO_y + 34,    EO_x + 50, EO_y + 18, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+        shapes.append(canv.create_line(EO_x, EO_y,       EO_x + 10, EO_y + 20,    EO_x, EO_y + 36, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+        shapes.append(canv.create_line(EO_x - 8, EO_y,       EO_x + 2, EO_y + 20,    EO_x - 8, EO_y + 36, fill = "black", width = 2.5, smooth = True, tags='shape'+tag_count))
+
+    elif(Type == "Not"):
+       #NOT gate============================================================================================
+
+        N_x = x - 10
+        N_y = y - 17
+
+        shapes.append(canv.create_polygon(N_x, N_y,       N_x, N_y + 34,     N_x + 30, N_y + 17, N_x, N_y, fill = "white", outline = 'black', width = 3, tags='shape'+tag_count))
+        shapes.append(canv.create_oval(N_x + 30, N_y + 12, N_x + 40, N_y + 22, width = 2, tags='shape'+tag_count))
+
+
+    elif(Type == "Nor"):
+        #NOR gate============================================================================================
+        
+        NO_x = x - 25
+        NO_y = y - 18
+
+        shapes.append(canv.create_polygon(NO_x + 5, NO_y + 2, NO_x + 32, NO_y + 2, NO_x + 32, NO_y + 34, NO_x + 5, NO_y +34, fill = 'white', tags='shape'+tag_count))
+        shapes.append(canv.create_line(NO_x, NO_y,       NO_x + 40, NO_y + 2,     NO_x + 50, NO_y + 18, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+        shapes.append(canv.create_line(NO_x, NO_y + 36,  NO_x + 40, NO_y + 34,    NO_x + 50, NO_y + 18, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+        shapes.append(canv.create_line(NO_x, NO_y,       NO_x + 10, NO_y + 20,    NO_x, NO_y + 36, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+        shapes.append(canv.create_oval(NO_x + 50, NO_y + 13, NO_x + 60, NO_y + 23, width = 2, tags='shape'+tag_count))
+
+    elif(Type == "Nand"):
+
+        #NAND gate ========================================================================================
+        NA_x = x - 15
+        NA_y = y - 18
+
+        shapes.append(canv.create_polygon(NA_x + 30, NA_y + 36, NA_x, NA_y + 36, NA_x, NA_y, NA_x + 30, NA_y, fill = "white", outline = 'black', width = 3, tags='shape'+tag_count))
+        shapes.append(canv.create_line(NA_x + 30, NA_y + 36, NA_x + 30, NA_y, fill = "white", width = 3, tags='shape'+tag_count))
+        shapes.append(canv.create_line(NA_x + 30.3, NA_y, NA_x + 57, NA_y + 18, NA_x + 30.3, NA_y + 36, fill = "black", width = 3, smooth = True, tags='shape'+tag_count))
+        shapes.append(canv.create_oval(NA_x + 44, NA_y + 13, NA_x + 54, NA_y + 23, width = 2, tags='shape'+tag_count))
+
+        # Start End
+
+    elif(Type == 'Start'):
+        shapes.append(canv.create_polygon(x + 18, y +18, x - 18, y + 18, x -18, y - 18, x + 18, y - 18, fill = 'white', outline = 'black', width = 3, tags='shape'+tag_count))
+
+    tag_counts += 1
+    return [shapes, tag_counts-1]
+
+
+class Point:            #점의 위치
+    px = float()
+    py = float()
+    res = str()
+    b = int()
+
+
+
+    def __init__(self, x, y):
+        self.px = x
+        self.py = y
+        self.res = None
+        self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
+
+    def setPoint(self, x, y):
+        self.px = x
+        self.py = y
+        canv.delete(self.b)
+        self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
+
+    def setRes(self, val):
+        self.res = val
+        if self.gate:
+            self.gate.setRes()
+
+        
+    def set_gate(self, gate):
+        self.gate = gate
+
+    def del_b(self):
+        canv.delete(self.b)
+        
+
+
+global End_ps
+End_ps = []         #끝 점들 모음.
+
+
+class Start_P(Point):
+    nextP = []
+    line = []
+    clk = 0
+
+
+    def __init__(self, x, y):
+        self.px = x
+        self.py = y
+        self.nextP = []
+        self.line = []
+        self.clk = 0
+        self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
+        
+        canv.tag_bind(self.b, '<B1-Motion>', self.line_drawing)
+        canv.tag_bind(self.b, '<ButtonRelease-1>', self.line_end)
+        canv.tag_bind(self.b, '<Button-3>', self.del_all_line_Ev)
+
+    
+    def setRes(self, c):
+        global End_ps
+        self.res = c
+        for i in self.nextP:
+            if(type(i) == type(self)):
+                i.setRes(c)
+            elif(type(i) == type(Point)):
+                End_ps[i].setRes(c)
+
+
+    def setnextP(self, k):
+        self.nextP.append(k)
+        self.nextP[len(self.line)-1].setRes(self.res)
+
+    def del_all_line(self):
+        while(len(self.nextP) != 0):
+            if(type(self.nextP[0]) == type(self)):
+                self.nextP[0].del_all_line()
+                self.nextP[0].del_b()
+                c = self.nextP.pop(0)
+                del c
+
+            elif(type(self.nextP[0]) == Point):
+                self.nextP[0].setRes(None)
+                del(self.nextP[0])
+
+        for i in range (len(self.line)):
+            canv.delete(self.line[0])
+            del self.line[0]
+
+
+    def del_all_line_Ev(self, event):
+        self.del_all_line()
+
+
+    def line_drawing(self, event):
+        if(self.clk == 1):
+            canv.delete(self.line[-1])
+            del self.line[-1]
+        
+        if(event.y <= self.py + 8 and event.y >= self.py - 8):   #가로선
+            self.line.append(canv.create_line(self.px + 6, self.py, event.x, self.py, width = 5))
+        elif(event.x <= self.px + 8 and event.x >= self.px - 8): #세로선
+            self.line.append(canv.create_line(self.px, self.py + 6, self.px, event.y, width = 5))
+        elif(abs(event.y) - self.py <= abs(event.x) - self.px): #-|
+            self.line.append(canv.create_line(self.px + 6, self.py, event.x, self.py, event.x, event.y, width=5))
+        elif(abs(event.y) - self.py >= abs(event.x) - self.px): #ㄱ/ㄴ
+            self.line.append(canv.create_line(self.px, self.py + 6, self.px, event.y, event.x, event.y, width=5))
+
+        self.clk = 1
+        
+
+    def line_end(self, event):
+        global End_ps
+        for k in range(len(End_ps)):
+            i = End_ps[k]
+            if(event.x <= i.px + 4 and event.x >= i.px -4 and event.y >=i.py - 4 and event.y <= i.py + 4):
+                canv.delete(self.line[-1])
+                del self.line[-1]
+                if(i.res == None):
+                    self.line.append(canv.create_line(self.px, self.py, self.px, i.py, i.px - 4, i.py, width=5))
+                    self.nextP.append(i)
+                    i.setRes(self.res)
+
+                    self.clk = 0
+                break
+        if(self.clk == 1):
+            if(event.y <= self.py + 8 and event.y >= self.py -8):
+                self.nextP.append(Start_P(event.x, self.py))
+            elif(event.x <= self.px + 8 and event.x >= self.px - 8): #세로선
+                self.nextP.append(Start_P(self.px, event.y))
+            else:
+                self.nextP.append(Start_P(event.x, event.y))
+
+            self.nextP[-1].setRes(self.res)
+            self.clk = 0
+
+
+
+
+class In2_gate:
+    #Type = [And, Nand...]
+    #x, y   위치
+    #shape = 모형
+    #sent   식
+    #res    값
+    #Input1, 2 = Point()
+
+    def __init__(self, Type, x, y):
+        self.Type = Type
+        self.x = x
+        self.y = y
+        self.clk1 = 0
+        self.res = '제대로 값이\n입력되지 않았습니다.'
+        self.label = Label(win, text = self.res, width = 20, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+
+        self.shape = Draw_gate(Type, x, y)
+
+        if (Type == 'And' ):
+            self.Input1 = Point(x - 15, y - 9)
+            self.Input2 = Point(x - 15, y + 9)
+            self.Output = Start_P(x + 28, y)
+            self.Input1.set_gate(self)
+            self.Input2.set_gate(self)
+            global End_ps
+            End_ps.append(self.Input1)
+            End_ps.append(self.Input2)
+        
+        elif (Type == 'Nand'):
+            self.Input1 = Point(x - 15, y - 9)
+            self.Input2 = Point(x - 15, y + 9)
+            self.Output = Start_P(x + 42, y)
+            self.Input1.set_gate(self)
+            self.Input2.set_gate(self)
+            End_ps.append(self.Input1)
+            End_ps.append(self.Input2)
+
+        elif(Type == 'Or'):
+            self.Input1 = Point(x - 25, y - 9)
+            self.Input2 = Point(x - 25, y + 9)
+            self.Output = Start_P(x + 23, y)
+            self.Input1.set_gate(self)
+            self.Input2.set_gate(self)
+            End_ps.append(self.Input1)
+            End_ps.append(self.Input2)
+
+        elif(Type == 'Nor'):
+            self.Input1 = Point(x - 25, y - 9)
+            self.Input2 = Point(x - 25, y + 9)
+            self.Output = Start_P(x + 37, y)
+            self.Input1.set_gate(self)
+            self.Input2.set_gate(self)
+            End_ps.append(self.Input1)
+            End_ps.append(self.Input2)
+
+        elif(Type == 'Ex_or'):
+            self.Input1 = Point(x - 30, y - 9)
+            self.Input2 = Point(x - 30, y + 9)
+            self.Output = Start_P(x + 23, y)
+            self.Input1.set_gate(self)
+            self.Input2.set_gate(self)
+            End_ps.append(self.Input1)
+            End_ps.append(self.Input2)
+
+        canv.tag_bind(self.shape[0], '<Button-1>', self.show_exp)              #식 출력
+
+
+    def show_exp(self, event):
+        if(self.clk1 == 0):
+            self.label.place(x=self.x - 65, y=self.y + 28)
+            self.clk1 = 1
+        else:
+            self.label.destroy()
+            self.clk1 = 0
+            self.label = Label(win, text = self.res, width = 20, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+
+    def setRes(self):
+        if(self.Input1.res == None or self.Input2.res == None):
+                self.res = '제대로 값이\n입력되지 않았습니다.'
+                self.label.destroy()
+                self.clk1 = 0
+                self.Output.setRes(None)
+                self.label = Label(win, text = self.res, width = 20, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+        else:
+            if(self.Type == 'And'):
+                self.res = '(' + self.Input1.res + ' * ' + self.Input2.res + ')'
+            if(self.Type == 'Nand'):
+                self.res = 'not (' + self.Input1.res + ' * ' + self.Input2.res + ')'
+            if(self.Type == 'Or'):
+                self.res = '(' + self.Input1.res + ' + ' + self.Input2.res + ')'
+            if(self.Type == 'Nor'):
+                self.res = 'not (' + self.Input1.res + ' + ' + self.Input2.res + ')'
+            if(self.Type == 'Ex_or'):
+                self.res = 'not (' + self.Input1.res + ' ⊕ ' + self.Input2.res + ')'
+            self.label.destroy()
+            self.clk1 = 0
+            self.Output.setRes(self.res)
+            self.label = Label(win, text = self.res, width = 20, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+ 
+
+class Not_gate:
+    #Type =  Not
+    #x, y   위치
+    #shape = 모형
+    #sent   식
+    #res    값
+    #Input1n= Point()
+
+    def __init__(self, x, y):
+        self.Type = 'Not'
+        self.x = x
+        self.y = y
+        self.clk1 = 0
+        self.res = '제대로 값이\n입력되지 않았습니다.'
+        self.label = Label(win, text = self.res, width = 20, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+
+        self.shape = Draw_gate('Not', x, y)
+
+        
+        self.Input = Point(x - 11, y)
+        self.Output = Start_P(x + 32, y)
+        self.Input.set_gate(self)
+        global End_ps
+        End_ps.append(self.Input)
+
+
+        canv.tag_bind(self.shape[0], '<Button-1>', self.show_exp)              #식 출력
+
+
+    def show_exp(self, event):
+        if(self.clk1 == 0):
+            self.label.place(x=self.x - 65, y=self.y + 28)
+            self.clk1 = 1
+        else:
+            self.label.destroy()
+            self.clk1 = 0
+            self.label = Label(win, text = self.res, width = 20, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+
+    def setRes(self):
+        if(self.Input.res == None):
+                self.res = '제대로 값이\n입력되지 않았습니다.'
+                self.label.destroy()
+                self.clk1 = 0
+                self.Output.setRes(None)
+                self.label = Label(win, text = self.res, width = 20, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+        else:
+
+            self.res = 'not (' + self.Input.res + ')'
+            self.label.destroy()
+            self.clk1 = 0
+            self.Output.setRes(self.res)
+            self.label = Label(win, text = self.res, width = 20, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+
+
+
+class Start_gate:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        
+        self.shape = canv.create_polygon(x + 18, y +18, x - 18, y + 18, x -18, y - 18, x + 18, y - 18, fill = 'white', outline = 'black', width = 3)
+        self.Output = Start_P(x + 23, y)
+        self.setR(None)     #식
+
+
+        #입력창
+        self.entIn = Entry(win, width = 1, font = "맑은고딕 20")
+        self.entIn.place(x=self.x - 15, y=self.y - 17)
+
+        #입력시 res에 삽입
+        self.entIn.bind("<Return>", self.inputres)
+        
+    def inputres(self, event):
+        self.setR(self.entIn.get())
+        a = 0
+        for i in match_N:
+            if(i[0] == self):
+                i[1] = self.res
+                a = 1
+                break
+
+        if(a == 0):
+                match_N.append([self, self.res])
+
+    def setR(self, res):         #점까지 
+        self.res = res
+        self.Output.setRes(self.res)
+
+
+class End_gate:
+    def __init__(self):
+        self.res = '제대로 값이 입력되지 않았습니다.'     #식
+        self.shape = canv.create_polygon(878, 297, 914, 297, 914, 333, 878, 333, fill = 'white', width = 3, outline = 'black')
+        self.clk1 = 0
+        self.label = Label(win, text = self.res, width = 132, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+        self.Input = Point(878, 315)
+        self.Input.set_gate(self)
+        global End_ps
+        End_ps.append(self.Input)
+
+
+        canv.tag_bind(self.shape, '<Button-1>', self.show_exp)              #식 출력
+
+
+    def show_exp(self, event):
+        if(self.clk1 == 0):
+            self.label.place(x=0, y=600)
+            self.clk1 = 1
+        else:
+            self.label.destroy()
+            self.clk1 = 0
+            self.label = Label(win, text = self.res, width = 132, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+
+    def setRes(self):
+        if(self.Input.res == None):
+            self.res = '제대로 값이 입력되지 않았습니다.'
+            self.label.destroy()
+            self.clk1 = 0
+            self.label = Label(win, text = self.res, width = 132, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+        else:
+
+            self.res = self.Input.res
+            self.label.destroy()
+            self.clk1 = 0
+            self.label = Label(win, text = self.res, width = 132, height = 2, fg = 'black', relief = 'flat', background = 'white')
+
+
+
+class gate_menu:            # 오른쪽에 있을 게이트 생성 위한 모형
+    gate_type = ['Start', 'And', 'Nand', 'Or', 'Nor', 'Not', 'Ex_or']
+
+        #gate_type에 따라 다른 모양의 게이트
+        #클릭시 각 점 없이 gate 모양만 생성, 마우스 따라가게 함. 이후 button release 시 그 자리에 gate 생성
+    def __init__(self, Type, x, y):
+        self.Type = Type
+        self.px = x
+        self.py = y
+        self.shape = Draw_gate(self.Type, self.px, self.py)
+        self.shape2 = None
+
+        canv.tag_bind(self.shape[0], '<Button-1>', self.create_shape2)
+        canv.tag_bind(self.shape[0], '<B1-Motion>', self.drag_shape2)
+        canv.tag_bind(self.shape[0], '<ButtonRelease-1>', self.create_gate)
+
+    def create_shape2(self, event):
+        if self.shape2 is None:
+            self.shape2 = Draw_gate(self.Type, event.x, event.y)
+
+    def drag_shape2(self, event):
+        if self.shape2 is not None:
+            for i in self.shape2:
+                canv.delete(i)
+            self.shape2 = Draw_gate(self.Type, event.x, event.y)
+
+    def create_gate(self, event):
+        for i in self.shape2:
+            canv.delete(i)
+        if(event.x < 914):
+            if(self.Type == 'Not'):
+                Not_gate(event.x, event.y)
+            elif(self.Type == 'Start'):
+                Start_gate(event.x, event.y)
+            else:
+                In2_gate(self.Type, event.x, event.y)
+
+
+
+
+
+
+
+gate_menu('Start', 1027, 90)
+gate_menu('And', 1013, 170)
+gate_menu('Nand', 1013, 250)
+gate_menu('Not', 1022, 330)
+gate_menu('Or', 1027, 410)
+gate_menu('Nor', 1027, 490)
+gate_menu('Ex_or', 1027, 570)
+Ed = End_gate()
+
+
+
+
+
+
+
+
+win.mainloop()
