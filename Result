@@ -30,8 +30,6 @@ match_N = []        #P, Q등 이름 input 정해지면 (입력한 점, 'P', '1')
                     #for i in match_N:
                                 #    if(i[1] == '이름'): i.append(str형의 값)        넣으면 아래의 eval_exp 함수 쓸 수 있을 것.
 
-
-
 def eval_exp(expression):
 
     global match_N
@@ -679,6 +677,78 @@ gate_menu('Nor', 1027, 490)
 gate_menu('Ex_or', 1027, 570)
 Ed = End_gate()
 
+
+#=======================================================================
+#진리표==================================================================
+
+
+def show_truth_table():
+    truth_table_window = Toplevel()
+    truth_table_window.title("진리표")
+    
+    # 입력 변수 이름을 가져오기
+    var_names = var_entry.get().split(',')
+    num_vars = len(var_names)
+    
+    # 출력 게이트 종류 설정
+    gate_names = ['and', 'not', 'or', 'nand', 'nor', 'xor']
+    
+    # 진리표 헤더 생성
+    for i, var_name in enumerate(var_names):
+        label = Label(truth_table_window, text=var_name)
+        label.grid(row=0, column=i)
+    for i, gate_name in enumerate(gate_names):
+        label = Label(truth_table_window, text=gate_name)
+        label.grid(row=0, column=num_vars + i)
+    
+    # 진리표 데이터 생성
+    for i in range(2**num_vars):
+        input_values = []
+        for j in range(num_vars):
+            input_values.append((i // 2**j) % 2)
+        
+        for j, input_value in enumerate(input_values):
+            label = Label(truth_table_window, text=str(input_value))
+            label.grid(row=i+1, column=j)
+        
+        for j, gate_name in enumerate(gate_names):
+            output_value = calculate_output(gate_name, input_values)
+            label = Label(truth_table_window, text=str(output_value))
+            label.grid(row=i+1, column=num_vars + j)
+    
+def calculate_output(gate_name, input_values):
+    if gate_name == 'and':
+        return int(all(input_values))
+    elif gate_name == 'not':
+        return int(not input_values[0])
+    elif gate_name == 'or':
+        return int(any(input_values))
+    elif gate_name == 'nand':
+        return int(not all(input_values))
+    elif gate_name == 'nor':
+        return int(not any(input_values))
+    elif gate_name == 'xor':
+        return int(sum(input_values) % 2)
+    else:
+        return None
+    
+# 메인 윈도우 생성
+root = Tk()
+
+# 변수 입력을 받을 엔트리 위젯 생성
+var_entry_label = Label(root, text="변수 입력 (쉼표로 구분):")
+var_entry_label.pack()
+var_entry = Entry(root)
+var_entry.pack()
+
+# 진리표 버튼 생성
+truth_table_button = Button(root, text="진리표 보기", command=show_truth_table)
+truth_table_button.pack()
+
+
+
+#========================================================================
+#========================================================================
 
 
 
