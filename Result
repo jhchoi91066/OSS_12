@@ -1,7 +1,7 @@
-#reset 버튼 제작중!
 #왼쪽 네모 끌어서 입력창 클릭 후 문자 하나 적고 enter 누르면 값 저장.
 #게이트 클릭 시 아래에 식 나옴. 고정되어있는 오른쪽에 End_gate는 클릭시 창 아래에 나옴.
 #점 좌클릭 -> 드래그 = 선 생성. 점 우클릭 = 선 삭제. *주의* 선 삭제는 클릭이 잘 안 될 수도 있음
+#우클릭 시 gate 삭제 추가
 
 from asyncio.windows_events import *
 from asyncio.windows_events import NULL
@@ -14,51 +14,15 @@ win.title("Test")
 win.option_add("*Fonts", "맑은고딕 25")
 win.geometry("1120x630")
 
+
+
+
 global canv
 canv = Canvas(win, width = 1280, height = 800, background = 'white')
 canv.pack(padx = 0, pady = 0)
 canv.create_line(934, 0, 934, 630, width = 3)
 
 
-'''
-def reset_all():
-    global win, canv, match_N, tag_counts, End_ps
-    match_N = []
-    tag_counts = 0
-    End_ps = []
-    win.destroy()
-    win = Tk()
-    win.title("Test")
-    win.option_add("*Fonts", "맑은고딕 25")
-    win.geometry("1120x630")
-
-    first_setting()
-    
-def first_setting():
-    global win, canv
-
-    
-    canv = Canvas(win, width = 1280, height = 800, background = 'white')
-    canv.pack(padx = 0, pady = 0)
-    canv.create_line(934, 0, 934, 630, width = 3)
-    reset_button = Button(win, text = "Reset!", command = reset_all())
-    reset_button.place(x=0, y=0)
-
-    gate_menu('Start', 1027, 90)
-    gate_menu('And', 1013, 170)
-    gate_menu('Nand', 1013, 250)
-    gate_menu('Not', 1022, 330)
-    gate_menu('Or', 1027, 410)
-    gate_menu('Nor', 1027, 490)
-    gate_menu('Ex_or', 1027, 570)
-    Ed = End_gate()
-
-
-
-reset_button = Button(win, text = "Reset!", command = reset_all)
-reset_button.place(x=0, y=0)
-
-'''
 
 global match_N
 match_N = []        #P, Q등 이름 input 정해지면 (입력한 점, 'P', '1') 형태로 넣기. Start_gate에서 입력 후 enter 시 (점, 이름)은 저장되므로 따로 값 물어보고 입력받아
@@ -260,6 +224,7 @@ class Point:            #점의 위치
         self.res = val
         if self.gate:
             self.gate.setRes()
+            
 
         
     def set_gate(self, gate):
@@ -286,6 +251,7 @@ class Start_P(Point):
         self.nextP = []
         self.line = []
         self.clk = 0
+        self.res = None
         self.b = canv.create_oval(self.px - 4, self.py - 4, self.px + 4, self.py + 4, fill="black")
         
         canv.tag_bind(self.b, '<B1-Motion>', self.line_drawing)
@@ -297,10 +263,7 @@ class Start_P(Point):
         global End_ps
         self.res = c
         for i in self.nextP:
-            if(type(i) == type(self)):
-                i.setRes(c)
-            elif(type(i) == type(Point)):
-                End_ps[i].setRes(c)
+            i.setRes(c)
 
 
     def setnextP(self, k):
@@ -316,8 +279,12 @@ class Start_P(Point):
                 del c
 
             elif(type(self.nextP[0]) == Point):
-                self.nextP[0].setRes(None)
+                for i in End_ps:
+                    if(i == self.nextP[0]):
+                        self.nextP[0].setRes(None)
+                        break
                 del(self.nextP[0])
+
 
         for i in range (len(self.line)):
             canv.delete(self.line[0])
@@ -373,7 +340,7 @@ class Start_P(Point):
 
 
 
-class In2_gate:
+class In2_gate:                 #===============================================================================================================================================
     #Type = [And, Nand...]
     #x, y   위치
     #shape = 모형
@@ -439,6 +406,7 @@ class In2_gate:
             End_ps.append(self.Input2)
 
         canv.tag_bind(self.shape[0], '<Button-1>', self.show_exp)              #식 출력
+        canv.tag_bind(self.shape[0], '<Button-3>', self.deletion)
 
 
     def show_exp(self, event):
@@ -475,9 +443,31 @@ class In2_gate:
             self.Output.setRes(self.res)
             self.label = Label(win, text = self.res, width = 20, height = 2, fg = 'black', relief = 'flat', background = 'white')
 
+    def deletion(self, event):
+        self.Output.del_b()
+        self.Input1.del_b()
+        self.Input2.del_b()
+        self.label.destroy()
+        self.Output.del_all_line()
+        for i in self.shape:
+            canv.delete(i)
+        End_ps.remove(self.Input1)
+        End_ps.remove(self.Input2)  #시작점 다음 값 삭제, 그림 삭제, 선 삭제, 점 삭제
+        del(self.Output)
+        del(self.Input2)
+        del(self.Input1)
+        del(self)
+            
+
+
+
+                    
+
+
+
  
 
-class Not_gate:
+class Not_gate:                 #========================================================================================================================================
     #Type =  Not
     #x, y   위치
     #shape = 모형
@@ -505,6 +495,7 @@ class Not_gate:
 
 
         canv.tag_bind(self.shape[0], '<Button-1>', self.show_exp)              #식 출력
+        canv.tag_bind(self.shape[0], '<Button-3>', self.deletion)
 
 
     def show_exp(self, event):
@@ -532,11 +523,22 @@ class Not_gate:
             self.clk1 = 0
             self.Output.setRes(self.res)
             self.label = Label(win, text = self.res, width = 20, height = 2, fg = 'black', relief = 'flat', background = 'white')
+    
+    def deletion(self, event):
+        self.Output.del_b()
+        self.Input.del_b()
+        self.label.destroy()
+        self.Output.del_all_line()
+        for i in self.shape:
+            canv.delete(i)
+        End_ps.remove(self.Input)
+        del(self.Output)
+        del(self.Input)
+        del(self)
 
 
 
-
-class Start_gate:
+class Start_gate:               #=======================================================================================================================================
 
     def __init__(self, x, y):
         self.x = x
@@ -553,6 +555,18 @@ class Start_gate:
 
         #입력시 res에 삽입
         self.entIn.bind("<Return>", self.inputres)
+        canv.tag_bind(self.shape, '<Button-3>', self.deletion)
+
+    def deletion(self, event):      #=============================================================================입력창 삭제, Match_N 삭제==================================
+        self.entIn.destroy()
+        self.Output.del_b()
+        self.Output.del_all_line()
+        for i in match_N:
+            if(i[0] == self):
+                match_N.remove(i)
+        canv.delete(self.shape)
+        del(self.Output)
+        del(self)        
         
     def inputres(self, event):
         self.setR(self.entIn.get())
